@@ -2,6 +2,9 @@
 pragma solidity ^0.8.9;
 
 contract CrowdFunding {
+    //Events
+
+    event CampaignCreated(uint256 indexed campaignId, address indexed owner, uint256 targetAmount, uint256 deadline);
     struct Campaign {
         address owner;
         string title;
@@ -25,6 +28,7 @@ contract CrowdFunding {
         uint256 _deadline,
         string memory _imageUrl
     ) public returns (uint256) {
+        //check date of deadline
         require(_deadline > block.timestamp, "Deadline must be in the future");
 
         Campaign storage newCampaign = campaigns[campaignCount];
@@ -36,9 +40,12 @@ contract CrowdFunding {
         newCampaign.deadline = _deadline;
         newCampaign.imageUrl = _imageUrl;
 
+        uint256 newCampaignId = campaignCount;
         campaignCount++;
 
-        return campaignCount - 1; // Return the ID of the newly created campaign
+        emit CampaignCreated(newCampaignId, msg.sender, _targetAmount, _deadline);
+
+        return newCampaignId; // Return the ID of the newly created campaign
     }
 
     function donateToCampaign(uint256 _campaignId) public payable {
